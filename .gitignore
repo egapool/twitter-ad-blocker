@@ -1,0 +1,4 @@
+src/vendor/*
+src/config/configure.php
+capistrano/*
+capistrano.zip

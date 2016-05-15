@@ -1,0 +1,8 @@
+{
+    "require": {
+    	"slim/slim": "^3.0",
+        "opauth/twitter": "dev-master",
+        "monolog/monolog": "^1.19",
+        "slim/php-view": "^2.1"
+    }
+}

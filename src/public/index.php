@@ -1,9 +1,11 @@
 <?php
+
 ini_set('display_errors',1);
 ini_set('error_reporting()',-1);
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
+use Abraham\TwitterOAuth\TwitterOAuth;
 
 require '../vendor/autoload.php';
 require '../config/configure.php';
@@ -71,42 +73,79 @@ $app->get('/', function (Request $request, Response $response) {
 })->setName('top');
 
 $app->get('/auth/twitter', function (Request $request, Response $response) {
-	$config = [
-	    'security_salt' => $this->get('settings')['oauth']['twitter']['security_salt'], //レスポンスのシグネチャ生成に使うソルト値。デフォルトのままだと Notice が出ておこられる
-	    'path' => '/auth/', // Opauth を動かす URL のパス
-	    'callback_url' => '/auth/twitter/callback',
+	// $config = [
+	//     'security_salt' => $this->get('settings')['oauth']['twitter']['security_salt'], //レスポンスのシグネチャ生成に使うソルト値。デフォルトのままだと Notice が出ておこられる
+	//     'path' => '/auth/', // Opauth を動かす URL のパス
+	//     'callback_url' => '/auth/twitter/callback',
 
-	    'Strategy' => [
-	        'Twitter' => [
-	            'key' => $this->get('settings')['oauth']['twitter']['key'],
-	            'secret' => $this->get('settings')['oauth']['twitter']['secret']
-	        ],
-	    ]
-	];
+	//     'Strategy' => [
+	//         'Twitter' => [
+	//             'key' => $this->get('settings')['oauth']['twitter']['key'],
+	//             'secret' => $this->get('settings')['oauth']['twitter']['secret']
+	//         ],
+	//     ]
+	// ];
 
-	new Opauth($config);
+	// new Opauth($config);
+	//TwitterOAuth をインスタンス化
+	$connection = new TwitterOAuth($this->get('settings')['oauth']['twitter']['key'], $this->get('settings')['oauth']['twitter']['secret']);
+	//コールバックURLをここでセット
+$request_token = $connection->oauth('oauth/request_token', array('oauth_callback' => "https://twitter-ad-blocker.8705.co/auth/twitter/callback"));
+	//callback.phpで使うのでセッションに入れる
+	$_SESSION['oauth_token'] = $request_token['oauth_token'];
+	$_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
+	//Twitter.com 上の認証画面のURLを取得( この行についてはコメント欄も参照 )
+	$url = $connection->url('oauth/authenticate', array('oauth_token' => $request_token['oauth_token']));
+
+	//Twitter.com の認証画面へリダイレクト
+	header( 'location: '. $url );
 
     return $response;
 });
 $app->get('/auth/twitter/callback', function (Request $request, Response $response) {
+	//login.phpでセットしたセッション
+	$request_token = [];  // [] は array() の短縮記法。詳しくは以下の「追々記」参照
+	$request_token['oauth_token'] = $_SESSION['oauth_token'];
+	$request_token['oauth_token_secret'] = $_SESSION['oauth_token_secret'];
+	//Twitterから返されたOAuthトークンと、あらかじめlogin.phpで入れておいたセッション上のものと一致するかをチェック
+	if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] !== $_REQUEST['oauth_token']) {
+	    die( 'Error!' );
+	}
+	//OAuth トークンも用いて TwitterOAuth をインスタンス化
+	$connection = new TwitterOAuth($this->get('settings')['oauth']['twitter']['key'], $this->get('settings')['oauth']['twitter']['secret'], $request_token['oauth_token'], $request_token['oauth_token_secret']);
+	//アプリでは、access_token(配列になっています)をうまく使って、Twitter上のアカウントを操作していきます
+	$_SESSION['access_token'] = $connection->oauth("oauth/access_token", array("oauth_verifier" => $_REQUEST['oauth_verifier']));
+	//セッションIDをリジェネレート
+	session_regenerate_id();
 	echo '<a href="/test">TEST API</a>';
     return $response;
 })->setName('top');
 
 $app->get('/test', function (Request $request, Response $response) {
-	$twitter = new tmhOAuth(
-		[
-			'consumer_key' 	=> $this->get('settings')['oauth']['twitter']['key'],
-			'consumer_secret' => $this->get('settings')['oauth']['twitter']['secret'],
-			'user_token' 	=> $_SESSION['_opauth_twitter']['oauth_token'],
-			'user_secret' 	=> $_SESSION['_opauth_twitter']['oauth_token_secret'],
-			'curl_ssl_verifypeer' => false,
-		]
-	);
-	$status = $twitter->request("GET", $twitter->url("1.1/account/settings"));
-	$res = json_decode($twitter->response['response']);
-    var_dump($status,$res);die;
-	echo 'callback';
+	// $twitter = new tmhOAuth(
+	// 	[
+	// 		'consumer_key' 	=> $this->get('settings')['oauth']['twitter']['key'],
+	// 		'consumer_secret' => $this->get('settings')['oauth']['twitter']['secret'],
+	// 		'user_token' 	=> $_SESSION['_opauth_twitter']['oauth_token'],
+	// 		'user_secret' 	=> $_SESSION['_opauth_twitter']['oauth_token_secret'],
+	// 		'curl_ssl_verifypeer' => false,
+	// 	]
+	// );
+	// $status = $twitter->request("GET", $twitter->url("1.1/account/settings"));
+	// $res = json_decode($twitter->response['response']);
+ //    var_dump($status,$res);die;
+	// echo 'callback';
+	//セッションに入れておいたさっきの配列
+	$access_token = $_SESSION['access_token'];
+	//OAuthトークンとシークレットも使って TwitterOAuth をインスタンス化
+	$connection = new TwitterOAuth($this->get('settings')['oauth']['twitter']['key'], $this->get('settings')['oauth']['twitter']['secret'], $access_token['oauth_token'], $access_token['oauth_token_secret']);
+	//ユーザー情報をGET
+	$user = $connection->get("account/verify_credentials");
+	//(ここらへんは、Twitter の API ドキュメントをうまく使ってください)
+
+	//GETしたユーザー情報をvar_dump
+	var_dump( $user );
+
     return $response;
 })->setName('top');
 

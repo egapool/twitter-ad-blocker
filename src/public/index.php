@@ -89,8 +89,7 @@ $app->get('/auth/twitter', function (Request $request, Response $response) {
     return $response;
 });
 $app->get('/auth/twitter/oauth_callback', function (Request $request, Response $response) {
-	$auth = new Opauth();
-	var_dump($_SESSION,$auth);die;
+	var_dump($_SESSION);die;
 	echo 'callback';
     return $response;
 })->setName('top');

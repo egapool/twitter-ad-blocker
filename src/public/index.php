@@ -89,7 +89,18 @@ $app->get('/auth/twitter', function (Request $request, Response $response) {
     return $response;
 });
 $app->get('/auth/twitter/oauth_callback', function (Request $request, Response $response) {
-	var_dump($_SESSION);die;
+	// var_dump($_SESSION);die;
+	$twitter = new tmhOAuth(
+		[
+			'consumer_key' 	=> $this->get('settings')['oauth']['twitter']['key'],
+			'consumer_secret' => $this->get('settings')['oauth']['twitter']['secret'],
+			'user_token' 	=> $_SESSION['_opauth_twitter']['oauth_token'],
+			'user_secret' 	=> $_SESSION['_opauth_twitter']['oauth_token_secret'],
+			'curl_ssl_verifypeer' => false,
+		]
+	);
+	$status = $twitter->request("GET", $twitter->url("1.1/account/settings"));v
+	var_dump($status);die;
 	echo 'callback';
     return $response;
 })->setName('top');

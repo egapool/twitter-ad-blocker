@@ -88,7 +88,7 @@ $app->get('/auth/twitter', function (Request $request, Response $response) {
 
     return $response;
 });
-$app->get('/auth/callback', function (Request $request, Response $response) {
+$app->get('/auth/twitter/oauth_callback', function (Request $request, Response $response) {
 	$auth = new Opauth();
 	var_dump($_SESSION,$auth);die;
 	echo 'callback';

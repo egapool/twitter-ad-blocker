@@ -72,7 +72,7 @@ $app->get('/', function (Request $request, Response $response) {
 
 $app->get('/auth/twitter', function (Request $request, Response $response) {
 	$config = [
-	    'security_salt' => 'hogehogehoslafkoihujki09876tr', //レスポンスのシグネチャ生成に使うソルト値。デフォルトのままだと Notice が出ておこられる
+	    'security_salt' => $this->get('settings')['oauth']['twitter']['security_salt'], //レスポンスのシグネチャ生成に使うソルト値。デフォルトのままだと Notice が出ておこられる
 	    'path' => '/auth/', // Opauth を動かす URL のパス
 	    'callback_url' => '/auth/callback',
 
@@ -88,8 +88,9 @@ $app->get('/auth/twitter', function (Request $request, Response $response) {
 
     return $response;
 });
-$app->get('/auth/twitter/oauth_callback', function (Request $request, Response $response) {
-	var_dump($_SESSION);die;
+$app->get('/auth/callback', function (Request $request, Response $response) {
+	$auth = new Opauth();
+	var_dump($_SESSION,$auth);die;
 	echo 'callback';
     return $response;
 })->setName('top');

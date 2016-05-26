@@ -10,3 +10,4 @@ $config['db']['pass']   = "password";
 $config['db']['dbname'] = "exampleapp";
 $config['oauth']['twitter']['key'] = 'twitter-api-key';
 $config['oauth']['twitter']['secret'] = 'twitter-api-secret';
+$config['oauth']['twitter']['security_salt'] = 'security-salt';

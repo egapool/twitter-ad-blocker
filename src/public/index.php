@@ -99,6 +99,7 @@ $request_token = $connection->oauth('oauth/request_token', array('oauth_callback
 
 	//Twitter.com の認証画面へリダイレクト
 	header( 'location: '. $url );
+	exit;
 
     return $response;
 });

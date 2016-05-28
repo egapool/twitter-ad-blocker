@@ -59,13 +59,6 @@ $container['db'] = function ($c) {
 };
 $container['view'] = new \Slim\Views\PhpRenderer("../templates/");
 
-$app->get('/hello/{name}', function (Request $request, Response $response) {
-    $name = $request->getAttribute('name');
-    // $response->getBody()->write("Hello, $name");
-
-    $response = $this->view->render($response, "hello.phtml", ["name" => $name]);
-    return $response;
-});
 $app->get('/', function (Request $request, Response $response) {
 	$response = $this->view->render($response, "index.phtml");
     return $response;
@@ -88,6 +81,7 @@ $app->get('/auth/twitter/callback', function (Request $request, Response $respon
 	$request_token = [];
 	$request_token['oauth_token'] = $_SESSION['oauth_token'];
 	$request_token['oauth_token_secret'] = $_SESSION['oauth_token_secret'];
+
 	//Twitterから返されたOAuthトークンと、あらかじめlogin.phpで入れておいたセッション上のものと一致するかをチェック
 	if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] !== $_REQUEST['oauth_token']) {
 	    die( 'Error!' );
@@ -112,29 +106,28 @@ $app->get('/auth/twitter/callback', function (Request $request, Response $respon
 
 	// ログイン処理
 	$user = new User($this->db);
-	$user->login($tw_user['id'],$tw_user['screen_name'],$tw_user['name'],$tw_user['profile_image_url']);
+	$user->login($tw_user->id,$tw_user->screen_name,$tw_user->name,$tw_user->profile_image_url);
 
 	echo '<a href="/test">TEST API</a>';
     return $response;
 })->setName('top');
 
 $app->get('/test', function (Request $request, Response $response) {
-	// $tw_id = 103;
-	// $screen_name = 'egapool';
-	// $name = 'えがちゃんまん';
-	// $icon_url = 'https://pbs.twimg.com/profile_images/1862974441/balloon-full_normal.jpeg';
 	$user = new User($this->db);
 	$login_user = $user->findByTwId($_SESSION['twitter_id']);
+
+	$access_token = $_SESSION['access_token'];
+	$connection = new TwitterOAuth(
+		$this->get('settings')['oauth']['twitter']['key'],
+		$this->get('settings')['oauth']['twitter']['secret'],
+		$access_token['oauth_token'],
+		$access_token['oauth_token_secret']
+	);
+	$timeline = $connection->get("statuses/user_timeline");
+	var_dump($timeline);die;
+
 	echo '<img src="'.$login_user['icon'].'" width="100" style="border-radius:50%;">';
 	var_dump($login_user);die;
-
-	/**
-	 * app側でログイン処理させる
-	 *
-	 */
-
-	//GETしたユーザー情報をvar_dump
-	var_dump( $user );
 
     return $response;
 })->setName('top');

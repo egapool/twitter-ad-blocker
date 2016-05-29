@@ -27,6 +27,14 @@ class User
 		];
 	}
 
+	public function findAllUsers()
+	{
+		$sql = "SELECT * FROM `users`";
+		$sth = $this->dbh->query($sql);
+		$users = $sth->fetchAll(PDO::FETCH_ASSOC);
+		return $users;
+	}
+
 	/**
 	 * login
 	 * @param array

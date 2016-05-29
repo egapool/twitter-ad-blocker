@@ -30,15 +30,14 @@ Class Blocker
 		// do block
 		$this->TwitterOAuth->post("blocks/create",["screen_name" => $block_account['screen_name']]);
 
-		// loggin
-		echo 'blocked ' . $block_account['screen_name'] . "\n";
-
+		// logging
+		$this->logging($user_id, $block_account['id']);
 	}
 
 	/**
 	 *
 	 */
-	public function getBlockList($user_id)
+	private function getBlockList($user_id)
 	{
 		$sql = "SELECT * FROM `ad_accounts`" . PHP_EOL;
 		$sql .= "WHERE id NOT IN (" . PHP_EOL;
@@ -52,8 +51,13 @@ Class Blocker
 		return $blockList;
 	}
 
-	public function logging($user_id,$ad_id)
+	private function logging($user_id,$ad_id)
 	{
-
+		$sql = "INSERT INTO `block_logs` (user_id,ad_id,created_at) VALUES (:user_id, :ad_id, :now)";
+		$sth = $this->dbh->prepare($sql);
+		$sth->bindValue(':user_id', $user_id, PDO::PARAM_STR);
+		$sth->bindValue(':ad_id', $ad_id, PDO::PARAM_STR);
+		$sth->bindValue(':now', time(), PDO::PARAM_STR);
+		$sth->execute();
 	}
 }

@@ -21,7 +21,7 @@ Class Blocker
 		if ( empty($blockList) ) return;
 
 		foreach ( $blockList as $account ) {
-			$this->block($user_id, $account['screen_name']);
+			$this->block($user_id, $account);
 		}
 	}
 

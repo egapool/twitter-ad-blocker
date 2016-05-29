@@ -49,7 +49,7 @@ class User
 		$sth->bindParam(':name', $name, PDO::PARAM_STR);
 		$sth->bindParam(':icon', $icon, PDO::PARAM_STR);
 		$sth->bindParam(':access_token', $access_token, PDO::PARAM_STR);
-		$sth->bindParam(':access_tokensecret', $access_tokensecret, PDO::PARAM_STR);
+		$sth->bindParam(':access_token_secret', $access_token_secret, PDO::PARAM_STR);
 		$sth->bindValue(':now', time(), PDO::PARAM_INT);
 		$sth->execute();
 

@@ -20,8 +20,8 @@ foreach ( $users as $user ) {
 	$TwitterOAuth = new TwitterOAuth(
 		$config['oauth']['twitter']['key'],
 		$config['oauth']['twitter']['secret'],
-		$user['oauth_token'],
-		$user['oauth_token_secret']
+		$user['access_token'],
+		$user['access_token_secret']
 	);
 	$blocker = new Blocker($pdo, $user, $TwitterOAuth);
 	$blocker->blockAll();

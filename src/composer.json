@@ -1,10 +1,8 @@
 {
     "require": {
-    	"slim/slim": "^3.0",
-        "opauth/twitter": "dev-master",
+        "slim/slim": "^3.4",
         "monolog/monolog": "^1.19",
         "slim/php-view": "^2.1",
-        "themattharris/tmhoauth": "^0.8.4",
         "abraham/twitteroauth": "^0.6.4"
     }
 }

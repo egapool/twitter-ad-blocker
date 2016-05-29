@@ -31,23 +31,25 @@ class User
 	 * login
 	 * @param array
 	 */
-	public function login($twitter_id, $screen_name, $name, $icon_url)
+	public function login($twitter_id, $screen_name, $name, $icon_url, $access_token,$access_token_secret)
 	{
 		$icon_url = str_replace("normal", "400x400", $icon_url);
 		$icon = chunk_split(base64_encode(file_get_contents($icon_url)));
 		if ( !$this->is_exist($twitter_id) ) {
 			// do insert
-			$sql = "INSERT INTO `users` (twitter_id,screen_name,name,icon,created_at,updated_at) VALUES (:twitter_id, :screen_name, :name, :icon, :now, :now);";
+			$sql = "INSERT INTO `users` (twitter_id,screen_name,name,icon,access_token,access_token_secret,created_at,updated_at) VALUES (:twitter_id, :screen_name, :name, :icon,:access_token, :access_token_secret,:now, :now);";
 			$sth = $this->dbh->prepare($sql);
 		} else {
 			// do update
-			$sql = "UPDATE `users` SET screen_name = :screen_name, name = :name, icon = :icon, updated_at = :now WHERE twitter_id = :twitter_id;";
+			$sql = "UPDATE `users` SET screen_name = :screen_name, name = :name, icon = :icon,access_token = :access_token,access_token_secret = :access_token_secret, updated_at = :now WHERE twitter_id = :twitter_id;";
 			$sth = $this->dbh->prepare($sql);
 		}
 		$sth->bindParam(':twitter_id', $twitter_id, PDO::PARAM_INT);
 		$sth->bindParam(':screen_name', $screen_name, PDO::PARAM_STR);
 		$sth->bindParam(':name', $name, PDO::PARAM_STR);
 		$sth->bindParam(':icon', $icon, PDO::PARAM_STR);
+		$sth->bindParam(':access_token', $access_token, PDO::PARAM_STR);
+		$sth->bindParam(':access_tokensecret', $access_tokensecret, PDO::PARAM_STR);
 		$sth->bindValue(':now', time(), PDO::PARAM_INT);
 		$sth->execute();
 

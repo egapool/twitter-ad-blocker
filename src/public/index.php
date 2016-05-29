@@ -106,7 +106,14 @@ $app->get('/auth/twitter/callback', function (Request $request, Response $respon
 
 	// ログイン処理
 	$user = new User($this->db);
-	$user->login($tw_user->id,$tw_user->screen_name,$tw_user->name,$tw_user->profile_image_url);
+	$user->login(
+		$tw_user->id,
+		$tw_user->screen_name,
+		$tw_user->name,
+		$tw_user->profile_image_url,
+		$access_token['oauth_token'],
+		$access_token['oauth_token_secret']
+	);
 
 	echo '<a href="/test">TEST API</a>';
     return $response;

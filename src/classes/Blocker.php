@@ -48,6 +48,15 @@ Class Blocker
 		$sth->execute();
 		$blockList = $sth->fetchAll(PDO::FETCH_ASSOC);
 
+		$friends = $this->getFriends($user_id);
+
+		foreach ( $blockList as $key => $block ) {
+
+			if ( isset($friends[$block['id']]) ) {
+				unset($blockList[$key]);
+			}
+		}
+
 		return $blockList;
 	}
 
@@ -59,5 +68,18 @@ Class Blocker
 		$sth->bindValue(':ad_id', $ad_id, PDO::PARAM_STR);
 		$sth->bindValue(':now', time(), PDO::PARAM_STR);
 		$sth->execute();
+	}
+
+	private function getFriends($user_id)
+	{
+		$output = [];
+		$res = $this->TwitterOAuth->get("friends/ids",[
+                "user_id" => $user["id"],
+                'count' => 5000
+        ]);
+        foreach ( $res->ids as $val ) {
+        	$output[$val] = '';
+        }
+        return $output;
 	}
 }

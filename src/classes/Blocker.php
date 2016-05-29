@@ -74,7 +74,7 @@ Class Blocker
 	{
 		$output = [];
 		$res = $this->TwitterOAuth->get("friends/ids",[
-                "user_id" => $user["id"],
+                "user_id" => $user_id,
                 'count' => 5000
         ]);
         foreach ( $res->ids as $val ) {

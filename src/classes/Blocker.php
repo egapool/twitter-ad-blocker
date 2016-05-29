@@ -4,7 +4,7 @@ Class Blocker
 {
 	public $user = null;
 
-	public $TwitterOAuthr = null;
+	public $TwitterOAuth = null;
 
 	public function __construct($dbh, $user, $TwitterOAuth)
 	{
@@ -28,7 +28,7 @@ Class Blocker
 	public function block($user_id,$block_account)
 	{
 		// do block
-		$this->TwitterOAuthr->post("blocks/create",["screen_name" => $block_account['screen_name']]);
+		$this->TwitterOAuth->post("blocks/create",["screen_name" => $block_account['screen_name']]);
 
 		// loggin
 		echo 'blocked ' . $block_account['screen_name'] . "\n";

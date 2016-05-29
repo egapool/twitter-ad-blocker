@@ -73,10 +73,8 @@ Class Blocker
 	private function getFriends($user_id)
 	{
 		$output = [];
-		$res = $this->TwitterOAuth->get("friends/ids",[
-                "user_id" => $user_id,
-                'count' => 5000
-        ]);
+		$res = $this->TwitterOAuth->get("friends/ids",["count" => 5000]);
+
         foreach ( $res->ids as $val ) {
         	$output[$val] = '';
         }

@@ -6,11 +6,18 @@ Class Blocker
 
 	public $TwitterOAuth = null;
 
+	private $logger = null;
+
 	public function __construct($dbh, $user, $TwitterOAuth)
 	{
 		$this->dbh 	= $dbh;
 		$this->user = $user;
 		$this->TwitterOAuth = $TwitterOAuth;
+	}
+
+	public function setLogger($logger)
+	{
+		$this->logger = $logger;
 	}
 
 	public function blockAll()
@@ -28,7 +35,13 @@ Class Blocker
 	public function block($user_id,$block_account)
 	{
 		// do block
-		$this->TwitterOAuth->post("blocks/create",["screen_name" => $block_account['screen_name']]);
+		$res = $this->TwitterOAuth->post("blocks/create",["screen_name" => $block_account['screen_name']]);
+		if ( $this->TwitterOAuth->getLastHttpCode() !== 200 ) {
+			$this->logger->error("Twitter API {blocks/create} Status Code is Not 200", ["request"=>"blocks/create","screen_name" => $block_account['screen_name']]);
+		}
+		if ( $res->errors !== NULL ) {
+			$this->logger->error("Twitter API {blocks/create} is faild", ["message"=>$res->errors[0]->message,"screen_name" => $block_account['screen_name']]);
+		}
 
 		// logging
 		$this->logging($user_id, $block_account['id']);
@@ -77,6 +90,7 @@ Class Blocker
 
 		// フォロー取得できないと消しすぎる可能性がある
 		if ( $res->errors !== NULL ) {
+			$this->logger->info("Twitter API {friends/ids} faild",["message"=>$res->errors[0]->message]);
 			exit;
 		}
 

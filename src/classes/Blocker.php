@@ -52,7 +52,7 @@ Class Blocker
 
 		foreach ( $blockList as $key => $block ) {
 
-			if ( isset($friends[$block['id']]) ) {
+			if ( isset($friends[$block['user_id']]) ) {
 				unset($blockList[$key]);
 			}
 		}

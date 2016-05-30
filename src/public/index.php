@@ -1,7 +1,9 @@
 <?php
 
-ini_set('display_errors',1);
-ini_set('error_reporting()',-1);
+if ( !isset($_SERVER['APP_ENV']) || $_SERVER['APP_ENV'] !== 'production' ) {
+	ini_set('display_errors',1);
+	ini_set('error_reporting()',-1);
+}
 
 use \Psr\Http\Message\ServerRequestInterface as Request;
 use \Psr\Http\Message\ResponseInterface as Response;
@@ -46,7 +48,8 @@ $app->add(function (Request $request, Response $response, $next){
 $container = $app->getContainer();
 $container['logger'] = function($c) {
     $logger = new \Monolog\Logger('my_logger');
-    $file_handler = new \Monolog\Handler\StreamHandler("../logs/app.log");
+    $date = (new DateTime())->format('Ymd');
+    $file_handler = new \Monolog\Handler\StreamHandler("../logs/{$date}.log");
     $logger->pushHandler($file_handler);
     return $logger;
 };
@@ -62,7 +65,7 @@ $container['view'] = new \Slim\Views\PhpRenderer("../templates/");
 $app->get('/', function (Request $request, Response $response) {
 	$response = $this->view->render($response, "index.phtml");
     return $response;
-})->setName('top');
+});
 
 $app->get('/auth/twitter', function (Request $request, Response $response) {
 	$connection = new TwitterOAuth($this->get('settings')['oauth']['twitter']['key'], $this->get('settings')['oauth']['twitter']['secret']);
@@ -78,14 +81,20 @@ $app->get('/auth/twitter', function (Request $request, Response $response) {
 });
 
 $app->get('/auth/twitter/callback', function (Request $request, Response $response) {
+
+	// cancel
+	if ( isset( $_GET['denied'] ) && !empty( $_GET['denied'] ) ) {
+		return $response->withStatus(302)->withHeader('Location', '/');
+	}
+
 	$request_token = [];
 	$request_token['oauth_token'] = $_SESSION['oauth_token'];
 	$request_token['oauth_token_secret'] = $_SESSION['oauth_token_secret'];
 
-	//Twitterから返されたOAuthトークンと、あらかじめlogin.phpで入れておいたセッション上のものと一致するかをチェック
 	if (isset($_REQUEST['oauth_token']) && $request_token['oauth_token'] !== $_REQUEST['oauth_token']) {
 	    die( 'Error!' );
 	}
+
 	$connection = new TwitterOAuth(
 		$this->get('settings')['oauth']['twitter']['key'],
 		$this->get('settings')['oauth']['twitter']['secret'],
@@ -115,9 +124,9 @@ $app->get('/auth/twitter/callback', function (Request $request, Response $respon
 		$access_token['oauth_token_secret']
 	);
 
-	echo '<a href="/test">TEST API</a>';
-    return $response;
-})->setName('top');
+	return $response->withStatus(301)->withHeader('Location', '/');
+
+});
 
 $app->get('/test', function (Request $request, Response $response) {
 	$user = new User($this->db);
@@ -137,7 +146,7 @@ $app->get('/test', function (Request $request, Response $response) {
 	var_dump($login_user);die;
 
     return $response;
-})->setName('top');
+});
 
 $app->run();
 // $app->get('/tickets', function (Request $request, Response $response) {

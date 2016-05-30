@@ -39,7 +39,7 @@ Class Blocker
 		if ( $this->TwitterOAuth->getLastHttpCode() !== 200 ) {
 			$this->logger->error("Twitter API {blocks/create} Status Code is Not 200", ["request"=>"blocks/create","screen_name" => $block_account['screen_name']]);
 		}
-		if ( $res->errors !== NULL ) {
+		if ( @$res->errors !== NULL ) {
 			$this->logger->error("Twitter API {blocks/create} is faild", ["message"=>$res->errors[0]->message,"screen_name" => $block_account['screen_name']]);
 		}
 

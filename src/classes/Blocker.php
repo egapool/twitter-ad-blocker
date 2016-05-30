@@ -75,6 +75,11 @@ Class Blocker
 		$output = [];
 		$res = $this->TwitterOAuth->get("friends/ids",["count" => 5000]);
 
+		// フォロー取得できないと消しすぎる可能性がある
+		if ( $res->errors !== NULL ) {
+			exit;
+		}
+
         foreach ( $res->ids as $val ) {
         	$output[$val] = '';
         }

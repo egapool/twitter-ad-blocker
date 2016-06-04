@@ -1,1 +1,37 @@
-<a href="/auth/twitter">twitterログイン</a>
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+<title></title>
+<meta name="description" content="">
+<meta name="author" content="">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="">
+<!--[if lt IE 9]>
+<script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<link rel="shortcut icon" href="">
+</head>
+<body>
+
+<?php //var_dump($user); ?>
+<div id="header">
+	<img src="<?php echo $user['icon'];?>" alt="<?php echo $user['name']; ?>" width="100">
+	<span><a href="https://twitter.com/<?php echo $user['screen_name']?>/">@<?php echo $user['screen_name'] ?></a></span>
+</div>
+<?php $cnt = count($blockList);?>
+<?php if ( $cnt === 0): ?>
+	まだ１アカウントもブロックしてません。
+<?php else: ?>
+	<p><?php echo $cnt ?>件ブロックしました。</p>
+	<h2>ブロックしたアカウント一覧</h2>
+<?php foreach ( $blockList as $block ): ?>
+<blockquote class="twitter-tweet" data-lang="ja"><a href="https://twitter.com/<?php echo $block['screen_name'] ?>/status/<?php echo $block['ad_status']; ?>"></a></blockquote>
+<?php endforeach; ?>
+<?php endif; ?>
+
+<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+</body>
+</html>

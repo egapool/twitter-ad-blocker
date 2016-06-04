@@ -89,7 +89,7 @@ Class Blocker
 		$res = $this->TwitterOAuth->get("friends/ids",["count" => 5000]);
 
 		// フォロー取得できないと消しすぎる可能性がある
-		if ( $res->errors !== NULL ) {
+		if ( @$res->errors !== NULL ) {
 			$this->logger->info("Twitter API {friends/ids} faild",["message"=>$res->errors[0]->message]);
 			exit;
 		}

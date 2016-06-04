@@ -63,7 +63,28 @@ $container['db'] = function ($c) {
 $container['view'] = new \Slim\Views\PhpRenderer("../templates/");
 
 $app->get('/', function (Request $request, Response $response) {
-	$response = $this->view->render($response, "index.phtml");
+
+	$user = null;
+
+	$_SESSION['twitter_id'] = 3769149553;
+
+	if ( isset($_SESSION['twitter_id']) ) {
+		$user = (new User($this->db))->findByTwId($_SESSION['twitter_id']);
+	}
+	if ( $user ) {
+		$blockObj = new Blocked($this->db);
+		$blockList = $blockObj->getBlockedAccounts($user['id']);
+
+		$v = [
+			"user" 		=> $user,
+			"blockList" => $blockList,
+		];
+		$response = $this->view->render($response, "index.phtml", $v);
+	} else {
+		echo '<a href="/auth/twitter">Twitterアカウントでログイン</a>';
+	}
+
+
     return $response;
 });
 

@@ -20,6 +20,7 @@ class User
 		if ( empty($user) ) return [];
 
 		return [
+			'id' => $user['id'],
 			'twitter_id' => $user['twitter_id'],
 			'screen_name' => $user['screen_name'],
 			'name' => $user['name'],

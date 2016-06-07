@@ -56,6 +56,7 @@ Class Blocker
 		$sql .= "WHERE id NOT IN (" . PHP_EOL;
 		$sql .= "	SELECT ad_id FROM `block_logs` WHERE user_id = :user_id" . PHP_EOL;
 		$sql .= ")" . PHP_EOL;
+		$sql .= " LIMIT 100" . PHP_EOL;
 		$sth = $this->dbh->prepare($sql);
 		$sth->bindValue(':user_id', $user_id, PDO::PARAM_STR);
 		$sth->execute();

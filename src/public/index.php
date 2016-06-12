@@ -64,7 +64,7 @@ $container['view'] = new \Slim\Views\PhpRenderer("../templates/");
 
 
 $app->get('/agent', function (Request $request, Response $response) {
-	var_dump($_SERVER['HTTP_USER_AGENT']);die;
+	var_dump(apache_response_headers());die;
 });
 
 $app->get('/', function (Request $request, Response $response) {

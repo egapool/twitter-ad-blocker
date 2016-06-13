@@ -22,4 +22,15 @@ class Blocked
 		$blocks = $sth->fetchAll(PDO::FETCH_ASSOC);
 		return $blocks;
 	}
+
+	public function getBlockedCount($user_id)
+	{
+		$sql = "SELECT count(*) as cnt FROM block_logs" . PHP_EOL;
+		$sql .= "where user_id = :user_id" . PHP_EOL;
+		$sth = $this->dbh->prepare($sql);
+		$sth->bindValue(':user_id', $user_id, PDO::PARAM_STR);
+		$sth->execute();
+		$blocks = $sth->fetch(PDO::FETCH_ASSOC);
+		return (int)$blocks['cnt'];
+	}
 }

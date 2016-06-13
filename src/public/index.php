@@ -66,16 +66,21 @@ $app->get('/', function (Request $request, Response $response) {
 
 	$user = null;
 
+	//
+	$_SESSION['twitter_id'] = "3769149553";
+
 	if ( isset($_SESSION['twitter_id']) ) {
 		$user = (new User($this->db))->findByTwId($_SESSION['twitter_id']);
 	}
 	if ( $user ) {
 		$blockObj = new Blocked($this->db);
 		$blockList = $blockObj->getBlockedAccounts($user['id']);
+		$blockCount = $blockObj->getBlockedCount($user['id']);
 
 		$v = [
 			"user" 		=> $user,
 			"blockList" => $blockList,
+			"blockCount" => $blockCount,
 		];
 		$response = $this->view->render($response, "index.phtml", $v);
 	} else {

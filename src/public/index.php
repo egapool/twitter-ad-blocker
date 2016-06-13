@@ -66,9 +66,6 @@ $app->get('/', function (Request $request, Response $response) {
 
 	$user = null;
 
-	//
-	$_SESSION['twitter_id'] = "3769149553";
-
 	if ( isset($_SESSION['twitter_id']) ) {
 		$user = (new User($this->db))->findByTwId($_SESSION['twitter_id']);
 	}
